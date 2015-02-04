@@ -5,6 +5,9 @@
 
 This project is meant to create a solid starting platform for projects in the Open Houston initiative. Please feel free to make improvements.
 
+
+Sample here: <a href="http://ohoustondotnet.azurewebsites.net" target="_blank">http://ohoustondotnet.azurewebsites.net</a>
+<h3>There is no SSL, so do not use sensitive passwords.</h3>
 <ul>
 <li>MVC5 website</li>
 <li>Oauth2 and backend pre-configured</li>
