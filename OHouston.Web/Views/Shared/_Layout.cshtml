@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>OHouston Web</title>
+    <script type="text/javascript">
+        FileAPI = {
+            debug: true,
+            //forceLoad: true, html5: false //to debug flash in HTML5 browsers
+            //wrapInsideDiv: true, //experimental for fixing css issues
+            //only one of jsPath or jsUrl.
+            //jsPath: '/js/FileAPI.min.js/folder/',
+            //jsUrl: 'yourcdn.com/js/FileAPI.min.js',
+
+            //only one of staticPath or flashUrl.
+            //staticPath: '/flash/FileAPI.flash.swf/folder/'
+            //flashUrl: 'yourcdn.com/js/FileAPI.flash.swf'
+        };
+    </script>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body ng-app="xPlat">
+    @RenderBody()
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <script type="text/javascript" src="~/Scripts/angular.js"></script>
+    <script type="text/javascript" src="~/Scripts/angular-mocks.js"></script>
+    <script type="text/javascript" src="~/Scripts/angular-animate.js"></script>
+    <script type="text/javascript" src="~/Scripts/angular-ui-router.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/app.js"></script>
+</body>
+</html>
