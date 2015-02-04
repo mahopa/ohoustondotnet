@@ -12,6 +12,6 @@ This project is meant to create a solid starting platform for projects in the Op
 <li>AngularJS 1.3</li>
 <li>Angular UI Router</li>
 <li>basic view transition animations</li>
-<li>registration/login functionality complete in UI<li>
+<li>registration/login functionality complete in UI</li>
 <li>angular templates and controllers seeded with boilerplate</li>
 </ul>
