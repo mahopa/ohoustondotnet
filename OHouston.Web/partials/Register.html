@@ -1,6 +1,7 @@
 ﻿<div class="jumbotron well">
     <div ng-if="registerInProcess==true">registering, please wait...</div>
     <div ng-hide="registerInProcess">
+        <h2>Don't use sensitive passwords. SSL is not enabled.</h2>
         <form name="registerForm" ng-submit="doRegister()">
             <h2>Register</h2>
             <div class="form-group">

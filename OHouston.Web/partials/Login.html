@@ -1,6 +1,7 @@
 ﻿<div class="well jumbotron">
     <div ng-if="loginInProcess==true">logging in, please wait...</div>
     <div ng-hide="loginInProcess">
+        <h2>Don't use sensitive passwords. SSL is not enabled.</h2>
         <form name="loginForm" ng-submit="doLogin()">
             <h2>Login</h2>
             <div class="form-group">
