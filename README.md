@@ -18,3 +18,10 @@ Sample here: <a href="http://ohoustondotnet.azurewebsites.net" target="_blank">h
 <li>registration/login functionality complete in UI</li>
 <li>angular templates and controllers seeded with boilerplate</li>
 </ul>
+<br/>
+<p>
+One thing that might not be super obvious about this project is that it is pretty much fully prepped to be the server side back end for a mobile app with OAuth2. It has the authentication infrastructure to allow a device to safely make api calls and provides the html/javascript code needed on the client side to do so. 
+</p>
+<p>
+But, this still does need to have CORS functionality enabled to allow cross domain authentication and api calls. Will update that soon.
+</p>
