@@ -23,6 +23,19 @@ namespace OHouston.Web
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+
+
+            bundles.Add(new ScriptBundle("~/bundles/dependencies").Include(
+                "~/Scripts/angular.js",
+                "~/Scripts/angular-ui-router.js",
+                "~/Scripts/angular-animate.js",
+                "~/Scripts/lodash.min.js",
+                "~/Scripts/angular-google-maps.min.js"
+                ));
+
+            bundles.Add(new Bundle("~/bundles/ohoustoncore").Include(
+                "~/Scripts/app.js"
+                ));
         }
     }
 }

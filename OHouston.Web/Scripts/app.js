@@ -1,13 +1,14 @@
 ﻿(function () {
     "use strict";
+    var version = '?v=' + $("#Version").val();
     var app = angular.module('xPlat', ['ui.router', 'ngAnimate']);
     app.config(function ($stateProvider, $urlRouterProvider) {
         $stateProvider.
-            state('home', { url: '/home', templateUrl: '/partials/index.html', controller: 'HomeCtrl' }).
-            state('menu', { url: '/menu', templateUrl: '/partials/Menu.html', controller: 'MenuCtrl' }).
-            state('login', { url: '/login', templateUrl: '/partials/login.html', controller: 'LoginCtrl' }).
-            state('register', { url: '/register', templateUrl: '/partials/register.html', controller: 'RegisterCtrl' }).
-            state('welcome', { url: '/welcome', templateUrl: '/partials/main/index.html', controller: 'WelcomeCtrl' });
+            state('home', { url: '/home', templateUrl: '/partials/index.html' + version, controller: 'HomeCtrl' }).
+            state('menu', { url: '/menu', templateUrl: '/partials/Menu.html' + version, controller: 'MenuCtrl' }).
+            state('login', { url: '/login', templateUrl: '/partials/login.html' + version, controller: 'LoginCtrl' }).
+            state('register', { url: '/register', templateUrl: '/partials/register.html' + version, controller: 'RegisterCtrl' }).
+            state('welcome', { url: '/welcome', templateUrl: '/partials/main/index.html' + version, controller: 'WelcomeCtrl' });
 
         $urlRouterProvider.otherwise('/home');
     });
@@ -139,6 +140,7 @@
 
         this.wipe = function () {
             localStorage.clear();
+            self.notifyOfOHoustonStatusChange();
             self.init();
         };
 
@@ -169,10 +171,10 @@
             $scope.loginInProcess = true;
             if ($scope.loginFormModel.Username && $scope.loginFormModel.Username.length >= 0 && $scope.loginFormModel.Password && $scope.loginFormModel.Password.length >= 8) {
 
-                dataAccess.login($scope.loginUsername, $scope.loginPassword,
+                dataAccess.login($scope.loginFormModel,
                     function (r) {
                         $scope.loginInProcess = false;
-                        oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.loginUsername });
+                        oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.loginFormModel.Username });
                         $state.go('welcome');
                     },
                     function (r) {
@@ -211,8 +213,8 @@
                 dataAccess.register($scope.registerFormModel, function (result) {
                     dataAccess.login($scope.registerUsername, $scope.registerPassword,
                         function (r) {
-                            oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.registerUsername });
-                            $state.go('home');
+                            oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.registerFormModel.Username });
+                            $state.go('welcome');
                             $scope.registerComplete = true;
                             $scope.registerInProcess = false;
                         },
