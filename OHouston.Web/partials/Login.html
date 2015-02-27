@@ -2,16 +2,10 @@
     <div ng-if="loginInProcess==true">logging in, please wait...</div>
     <div ng-hide="loginInProcess">
         <h2>Don't use sensitive passwords. SSL is not enabled.</h2>
-        <form name="loginForm" ng-submit="doLogin()">
+        <form name="loginForm" ng-submit="doLogin()" novalidate>
             <h2>Login</h2>
-            <div class="form-group">
-                <label>Username</label>
-                <input class="form-control" type="text" ng-model="loginUsername" />
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input class="form-control" type="password" ng-model="loginPassword" />
-            </div>
+            <gb-model-state form="loginForm" datamodel="loginFormModel" key="Username"></gb-model-state>
+            <gb-model-state form="loginForm" datamodel="loginFormModel" key="Password"></gb-model-state>
             <div class="form-group">
                 <button type="submit" class="btn btn-default">Log In</button>
             </div>

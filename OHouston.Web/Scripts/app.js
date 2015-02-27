@@ -41,6 +41,24 @@
         };
     });
 
+    app.directive('gbModelState', function () {
+        return {
+            restrict: 'AE',
+            scope: {
+                key: '@',
+                datamodel: '=',
+                form: '='
+            },
+            templateUrl: '/partials/misc/ModelState.html'
+        }
+    });
+
+    app.filter('camelCaseToHuman', function () {
+        return function (input) {
+            return input.charAt(0).toUpperCase() + input.substr(1).replace(/[A-Z]/g, ' $&');
+        }
+    });
+
     app.factory('dataAccess',
         function ($http) {
             function register(data, onSuccess, onFailure) {
@@ -48,19 +66,21 @@
                 data)
                 .then(onSuccess, onFailure);
             };
-            function login(username, password, onSuccess, onFailure) {
+            function login(data, onSuccess, onFailure) {
+                var username = data.Username;
+                var password = data.Password;
                 $http.post('/Token',
                 "userName=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password) + "&grant_type=password", { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
                 .then(onSuccess, onFailure);
             };
             return {
                 register: function (data, onSuccess, onFailure) { return register(data, onSuccess, onFailure); },
-                login: function (username, password, onSuccess, onFailure) { return login(username, password, onSuccess, onFailure); }
+                login: function (data, onSuccess, onFailure) { return login(data, onSuccess, onFailure); }
             };
         });
 
 
-    app.service('oHoustonSvc', function ($http, dataAccess) {
+    app.service('oHoustonSvc', function ($http, $state, dataAccess) {
         var self = this; // Save reference
 
         this.guid = function () {
@@ -72,49 +92,59 @@
             });
             return uuid;
         };
-
-        this.token = null;
-        this.username = null;
-        this.getUsername = function () {
-            self.username = localStorage.getItem('username');
-            return self.username;
-        };
-        this.getToken = function () {
-            self.token = localStorage.getItem('accessToken');
-            return self.token;
-        }
-        this.setToken = function (data) {
-            if (!data || !data.token) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('username');
-                self.notifyOfOHoustonStatusChange();
-                return null;
-            } else {
-                $http.defaults.headers.common['Authorization'] = 'Bearer ' + data.token;
-                localStorage.setItem('username', data.username);
-                var result = localStorage.setItem('accessToken', data.token);
-                self.notifyOfOHoustonStatusChange();
-                return result;
+        this.init = function () {
+            this.token = null;
+            this.username = null;
+            this.getUsername = function () {
+                self.username = localStorage.getItem('username');
+                return self.username;
+            };
+            this.getToken = function () {
+                self.token = localStorage.getItem('accessToken');
+                return self.token;
             }
+            this.setToken = function (data) {
+                if (!data || !data.token) {
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('username');
+                    self.notifyOfOHoustonStatusChange();
+                    return null;
+                } else {
+                    $http.defaults.headers.common['Authorization'] = 'Bearer ' + data.token;
+                    localStorage.setItem('username', data.username);
+                    var result = localStorage.setItem('accessToken', data.token);
+                    self.notifyOfOHoustonStatusChange();
+                    return result;
+                }
+            };
+            $http.defaults.headers.common['Authorization'] = 'Bearer ' + self.getToken();
+
+
+            this.oHoustonStatusChangeCallbacks = {};
+            this.awaitOHoustonStatusChange = function (key, callback) { self.oHoustonStatusChangeCallbacks[key] = callback; };
+            this.notifyOfOHoustonStatusChange = function () {
+                $.each(self.oHoustonStatusChangeCallbacks, function (i, callback) {
+                    callback();
+                });
+                return self.getUsername();
+            };
+            this.messageConnectionStatus = 'not started';
+            //self.notifyOfOHoustonStatusChange();
+
+            this.logoff = function () {
+                self.wipe();
+            };
         };
-        $http.defaults.headers.common['Authorization'] = 'Bearer ' + self.getToken();
 
 
-        this.oHoustonStatusChangeCallbacks = {};
-        this.awaitOHoustonStatusChange = function (key, callback) { self.oHoustonStatusChangeCallbacks[key] = callback; };
-        this.notifyOfOHoustonStatusChange = function () {
-            $.each(self.oHoustonStatusChangeCallbacks, function (i, callback) {
-                callback();
-            });
-            return self.getUsername();
-        };
-        this.messageConnectionStatus = 'not started';
-        //self.notifyOfOHoustonStatusChange();
-
-        this.logoff = function () {
-            self.setToken(false);
+        this.wipe = function () {
+            localStorage.clear();
+            self.init();
         };
 
+
+
+        this.init();
     });
 
     app.controller('MenuCtrl', function ($scope, $state, oHoustonSvc, dataAccess) {
@@ -125,7 +155,7 @@
 
         $scope.logoff = function () {
             oHoustonSvc.logoff();
-            $state.go('home');
+            $state.go('login');
         };
     });
     app.controller('HomeCtrl', function ($scope, $location, $stateParams, oHoustonSvc, dataAccess) {
@@ -134,54 +164,83 @@
     });
     app.controller('LoginCtrl', function ($scope, $state, oHoustonSvc, dataAccess) {
         $scope.loginInProcess = false;
+        $scope.loginFormModel = {};
         $scope.doLogin = function () {
             $scope.loginInProcess = true;
-            dataAccess.login($scope.loginUsername, $scope.loginPassword,
-                function (r) {
-                    $scope.loginInProcess = false;
-                    oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.loginUsername });
-                    $state.go('welcome');
-                },
-                function (r) {
-                    $scope.loginInProcess = false;
-                    alert('invalid username or password');
-                    console.log(r);
-                });
-        };
-    });
-    app.controller('RegisterCtrl', function ($scope, $state, $timeout,  oHoustonSvc, dataAccess) {
-        $scope.registerInProcess = false;
-        $scope.registerComplete = false;
-        $scope.doRegister = function () {
-            $scope.registerInProcess = true;
-            dataAccess.register({
-                Username: $scope.registerUsername,
-                Email: $scope.registerEmail,
-                Password: $scope.registerPassword,
-                ConfirmPassword: $scope.registerPassword2
-            }, function (result) {
-                dataAccess.login($scope.registerUsername, $scope.registerPassword,
+            if ($scope.loginFormModel.Username && $scope.loginFormModel.Username.length >= 0 && $scope.loginFormModel.Password && $scope.loginFormModel.Password.length >= 8) {
+
+                dataAccess.login($scope.loginUsername, $scope.loginPassword,
                     function (r) {
-                        oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.registerUsername });
+                        $scope.loginInProcess = false;
+                        oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.loginUsername });
                         $state.go('welcome');
-                        $scope.registerComplete = true;
-                        $scope.registerInProcess = false;
                     },
                     function (r) {
-                        $scope.registerComplete = true;
-                        $scope.registerInProcess = false;
-                        console.log('Register succeeded. Login failed.');
-                        console.log(r);
+                        $scope.loginInProcess = false;
+                        $scope.loginForm.Password.$invalid = true;
+                        $scope.loginForm.Password.$pristine = false;
+                        $scope.loginForm.Password.$valid = false;
+
+                        if (r.data && r.data.error_description) {
+                            $scope.loginForm.Password.errors = [r.data.error_description];
+                        } else {
+                            $scope.loginForm.Password.errors = ['The user name or password is incorrect.'];
+                        }
                     });
-            }, function (result) {
+            } else {
+                $scope.loginInProcess = false;
+                $scope.loginForm.Password.$invalid = true;
+                $scope.loginForm.Password.$pristine = false;
+                $scope.loginForm.Password.$valid = false;
+                $scope.loginForm.Password.errors = ['"The user name or password is incorrect."'];
+
+            }
+        };
+    });
+    app.controller('RegisterCtrl', function ($scope, $state, $timeout, oHoustonSvc, dataAccess) {
+
+        $scope.registerInProcess = false;
+        $scope.registerComplete = false;
+        $scope.registerFormModel = {};
+        $scope.doRegister = function () {
+
+
+            $scope.registerInProcess = true;
+            if ($scope.registerFormModel.Password && $scope.registerFormModel.Password == $scope.registerFormModel.ConfirmPassword) {
+
+                dataAccess.register($scope.registerFormModel, function (result) {
+                    dataAccess.login($scope.registerUsername, $scope.registerPassword,
+                        function (r) {
+                            oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.registerUsername });
+                            $state.go('home');
+                            $scope.registerComplete = true;
+                            $scope.registerInProcess = false;
+                        },
+                        function (r) {
+                            $scope.registerComplete = true;
+                            $scope.registerInProcess = false;
+                            console.log('Register succeeded. Login failed.');
+                            console.log(r);
+                        });
+                }, function (result) {
+                    $scope.registerInProcess = false;
+                    if (result.data.ModelState) {
+                        $.each(result.data.ModelState, function (k, v) {
+                            $scope.registerForm[k].$valid = false;
+                            $scope.registerForm[k].$invalid = true;
+                            $scope.registerForm[k].errors = v;
+                        });
+                    } else {
+                        alert('something went wrong registering :(');
+                    }
+                });
+            } else {
                 $scope.registerInProcess = false;
-                console.log(result);
-                if (result.data.Message) {
-                    alert(result.data.Message);
-                } else {
-                    alert('something went wrong registering :(');
-                }
-            });
+                $scope.registerForm.Password.$invalid = true;
+                $scope.registerForm.Password.$pristine = false;
+                $scope.registerForm.Password.$valid = false;
+                $scope.registerForm.Password.errors = ['mismatched passwords'];
+            }
         };
 
     });

@@ -1,0 +1,12 @@
+﻿<div class="form-group" ng-class="{ 'has-error' : form[key].$invalid && !form[key].$pristine }">
+    <label for="{{key}}">{{key|camelCaseToHuman}}</label>
+    <input ng-if="!(key.indexOf('escription')>-1) && !(key.indexOf('ddress')>-1)" id="{{key}}" class="form-control" type="{{(key.indexOf('assword')>-1?'password':'text')}}" name="{{key}}" ng-model="datamodel[key]" placeholder="{{key|camelCaseToHuman}}" />
+    <textarea ng-if="(key.indexOf('escription')>-1) || (key.indexOf('ddress')>-1)" id="{{key}}" class="form-control" type="{{(key.indexOf('assword')>-1?'password':'text')}}" name="{{key}}" ng-model="datamodel[key]" placeholder="{{key|camelCaseToHuman}}"></textarea>
+    <div ng-if="form[key].$invalid && !form[key].$pristine">
+        <ul>
+            <li ng-repeat="err in form[key].errors">
+                <small>{{err}}</small>
+            </li>
+        </ul>
+    </div>
+</div>
