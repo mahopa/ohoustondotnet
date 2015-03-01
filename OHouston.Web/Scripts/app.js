@@ -94,17 +94,17 @@
             return uuid;
         };
         this.init = function () {
-            this.token = null;
-            this.username = null;
-            this.getUsername = function () {
+            self.token = null;
+            self.username = null;
+            self.getUsername = function () {
                 self.username = localStorage.getItem('username');
                 return self.username;
             };
-            this.getToken = function () {
+            self.getToken = function () {
                 self.token = localStorage.getItem('accessToken');
                 return self.token;
             }
-            this.setToken = function (data) {
+            self.setToken = function (data) {
                 if (!data || !data.token) {
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('username');
@@ -120,23 +120,26 @@
             };
             $http.defaults.headers.common['Authorization'] = 'Bearer ' + self.getToken();
 
-
-            this.oHoustonStatusChangeCallbacks = {};
-            this.awaitOHoustonStatusChange = function (key, callback) { self.oHoustonStatusChangeCallbacks[key] = callback; };
-            this.notifyOfOHoustonStatusChange = function () {
-                $.each(self.oHoustonStatusChangeCallbacks, function (i, callback) {
-                    callback();
-                });
-                return self.getUsername();
-            };
-            this.messageConnectionStatus = 'not started';
-            //self.notifyOfOHoustonStatusChange();
-
-            this.logoff = function () {
-                self.wipe();
-            };
         };
 
+
+        this.oHoustonStatusChangeCallbacks = {};
+        this.awaitOHoustonStatusChange = function (key, callback) {
+            self.oHoustonStatusChangeCallbacks[key] = callback;
+        };
+        this.notifyOfOHoustonStatusChange = function () {
+
+            $.each(self.oHoustonStatusChangeCallbacks, function (i, callback) {
+                callback();
+            });
+            return self.getUsername();
+        };
+        this.messageConnectionStatus = 'not started';
+        //self.notifyOfOHoustonStatusChange();
+
+        this.logoff = function () {
+            self.wipe();
+        };
 
         this.wipe = function () {
             localStorage.clear();
@@ -153,7 +156,9 @@
         $scope.username = oHoustonSvc.getUsername();
         oHoustonSvc.awaitOHoustonStatusChange('MenuCtrl', function () {
             $scope.username = oHoustonSvc.getUsername();
+
         });
+
 
         $scope.logoff = function () {
             oHoustonSvc.logoff();
@@ -169,7 +174,7 @@
         $scope.loginFormModel = {};
         $scope.doLogin = function () {
             $scope.loginInProcess = true;
-            if ($scope.loginFormModel.Username && $scope.loginFormModel.Username.length >= 0 && $scope.loginFormModel.Password && $scope.loginFormModel.Password.length >= 8) {
+            if ($scope.loginFormModel.Username && $scope.loginFormModel.Username.length >= 0 && $scope.loginFormModel.Password && $scope.loginFormModel.Password.length >= 6) {
 
                 dataAccess.login($scope.loginFormModel,
                     function (r) {
@@ -211,12 +216,12 @@
             if ($scope.registerFormModel.Password && $scope.registerFormModel.Password == $scope.registerFormModel.ConfirmPassword) {
 
                 dataAccess.register($scope.registerFormModel, function (result) {
-                    dataAccess.login($scope.registerUsername, $scope.registerPassword,
+                    dataAccess.login({ Username: $scope.registerFormModel.Username, Password: $scope.registerFormModel.Password },
                         function (r) {
-                            oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.registerFormModel.Username });
-                            $state.go('welcome');
                             $scope.registerComplete = true;
                             $scope.registerInProcess = false;
+                            oHoustonSvc.setToken({ token: r.data.access_token, username: $scope.registerFormModel.Username });
+                            $state.go('welcome');
                         },
                         function (r) {
                             $scope.registerComplete = true;
