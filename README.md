@@ -3,11 +3,10 @@
   
   shout out to http://ohouston.org/
 
+**Goals**<br/>
 This project is meant to create a solid starting platform for projects in the Open Houston initiative. Please feel free to make improvements.
-
-
-Sample here: <a href="http://ohoustondotnet.azurewebsites.net" target="_blank">http://ohoustondotnet.azurewebsites.net</a>
-<h3>There is no SSL, so do not use sensitive passwords.</h3>
+<hr/>
+Working sample here: <a href="http://ohoustondotnet.azurewebsites.net" target="_blank">There is no SSL, so do not use sensitive passwords.</a>
 <br>
 <hr/>
 <h4>Features</h4>
@@ -27,6 +26,10 @@ Sample here: <a href="http://ohoustondotnet.azurewebsites.net" target="_blank">h
 <p>
 One thing that might not be super obvious about this project is that it is pretty much fully prepped to be the server side back end for a mobile app with OAuth2. It has the authentication infrastructure to allow a device to safely make api calls and provides the html/javascript code needed on the client side to do so. 
 </p>
-<p>
-But, this still does need to have CORS functionality enabled to allow cross domain authentication and api calls. Will update that soon.
-</p>
+<br/>
+<h3>Remaining goals</h3>
+<ul>
+<li>Configure CORS in a turnkey manner so your project can quickly become a public facing re-usable API for others.</li>
+<li>Server side unit tests.</li>
+<li>Client side unit tests.</li>
+</ul>

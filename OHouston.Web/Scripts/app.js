@@ -119,7 +119,6 @@
                 }
             };
             $http.defaults.headers.common['Authorization'] = 'Bearer ' + self.getToken();
-
         };
 
 
