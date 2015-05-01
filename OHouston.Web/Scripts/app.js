@@ -2,7 +2,7 @@
     "use strict";
     var version = '?v=' + $("#Version").val();
     var app = angular.module('xPlat', ['ui.router', 'ngAnimate']);
-    app.config(function ($stateProvider, $urlRouterProvider) {
+    app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
         $stateProvider.
             state('home', { url: '/home', templateUrl: '/partials/index.html' + version, controller: 'HomeCtrl' }).
             state('menu', { url: '/menu', templateUrl: '/partials/Menu.html' + version, controller: 'MenuCtrl' }).
@@ -11,7 +11,7 @@
             state('welcome', { url: '/welcome', templateUrl: '/partials/main/index.html' + version, controller: 'WelcomeCtrl' });
 
         $urlRouterProvider.otherwise('/home');
-    });
+    }]);
     app.directive("fileread", [function () {
         return {
             scope: {
@@ -28,7 +28,7 @@
             }
         }
     }]);
-    app.directive('ngTextChange', function () {
+    app.directive('ngTextChange', [function () {
         return {
             restrict: 'A',
             replace: 'ngModel',
@@ -40,27 +40,72 @@
                 });
             }
         };
-    });
+    }]);
 
-    app.directive('gbModelState', function () {
+    app.directive('gbModelState', [function () {
         return {
             restrict: 'AE',
             scope: {
                 key: '@',
+                displayname: '@',
+                showlabel: '=',
                 datamodel: '=',
                 form: '='
             },
-            templateUrl: '/partials/misc/ModelState.html'
+            templateUrl: '/partials/misc/ModelState.html?v=' + window.thinkSyncVersion
         }
-    });
-
-    app.filter('camelCaseToHuman', function () {
+    }]);
+    app.filter('camelCaseToHuman', [function () {
         return function (input) {
             return input.charAt(0).toUpperCase() + input.substr(1).replace(/[A-Z]/g, ' $&');
         }
-    });
+    }]);
+    app.controller('gbFancyEditController', ['$scope', function ($scope) {
+        $scope.beginEdit = function () {
+            //editing=((editable && !false)?true:false)
+            if (!$scope.editing && $scope.editable) {
+                $scope.editing = true;
+                $scope.backup = angular.copy($scope.datamodel[$scope.key]);
+            }
+        };
 
-    app.factory('dataAccess',
+        $scope.finishEdit = function () {
+            $scope.editing = false;
+        };
+
+        $scope.$watch('form.completed', function () {
+            if ($scope.form.completed) {
+                $scope.finishEdit();
+                delete $scope.form.completed;
+            }
+        });
+    }]);
+    app.directive('gbFancyEdit', [function () {
+        function link(scope, element, attributes, controller) {
+            scope.restore = function () {
+                scope.editing = false;
+                scope.datamodel[scope.key] = scope.backup;
+            };
+        };
+        return {
+            controller: "gbFancyEditController",
+            link: link,
+            restrict: 'AE',
+            scope: {
+                key: '@',
+                size: '@',
+                color: '@',
+                bold: '@',
+                editable: '=',
+                editing: '=',
+                datamodel: '=',
+                form: '='
+            },
+            templateUrl: '/partials/misc/FancyEdit.html?v=' + window.thinkSyncVersion
+        }
+    }]);
+
+    app.factory('dataAccess', ['$http',
         function ($http) {
             function register(data, onSuccess, onFailure) {
                 $http.post('/api/Account/Register',
@@ -78,10 +123,10 @@
                 register: function (data, onSuccess, onFailure) { return register(data, onSuccess, onFailure); },
                 login: function (data, onSuccess, onFailure) { return login(data, onSuccess, onFailure); }
             };
-        });
+        }]);
 
 
-    app.service('oHoustonSvc', function ($http, $state, dataAccess) {
+    app.service('oHoustonSvc', ['$http', '$state', 'dataAccess', function ($http, $state, dataAccess) {
         var self = this; // Save reference
 
         this.guid = function () {
@@ -149,26 +194,24 @@
 
 
         this.init();
-    });
+    }]);
 
-    app.controller('MenuCtrl', function ($scope, $state, oHoustonSvc, dataAccess) {
+    app.controller('MenuCtrl', ['$scope', '$state', 'oHoustonSvc', 'dataAccess', function ($scope, $state, oHoustonSvc, dataAccess) {
         $scope.username = oHoustonSvc.getUsername();
         oHoustonSvc.awaitOHoustonStatusChange('MenuCtrl', function () {
             $scope.username = oHoustonSvc.getUsername();
 
         });
-
-
         $scope.logoff = function () {
             oHoustonSvc.logoff();
             $state.go('login');
         };
-    });
-    app.controller('HomeCtrl', function ($scope, $location, $stateParams, oHoustonSvc, dataAccess) {
+    }]);
+    app.controller('HomeCtrl', ['$scope', '$location', '$stateParams', 'oHoustonSvc', 'dataAccess', function ($scope, $location, $stateParams, oHoustonSvc, dataAccess) {
 
 
-    });
-    app.controller('LoginCtrl', function ($scope, $state, oHoustonSvc, dataAccess) {
+    }]);
+    app.controller('LoginCtrl', ['$scope', '$state', 'oHoustonSvc', 'dataAccess', function ($scope, $state, oHoustonSvc, dataAccess) {
         $scope.loginInProcess = false;
         $scope.loginFormModel = {};
         $scope.doLogin = function () {
@@ -202,8 +245,8 @@
 
             }
         };
-    });
-    app.controller('RegisterCtrl', function ($scope, $state, $timeout, oHoustonSvc, dataAccess) {
+    }]);
+    app.controller('RegisterCtrl', ['$scope', '$state', '$timeout', 'oHoustonSvc', 'dataAccess', function ($scope, $state, $timeout, oHoustonSvc, dataAccess) {
 
         $scope.registerInProcess = false;
         $scope.registerComplete = false;
@@ -249,9 +292,9 @@
             }
         };
 
-    });
+    }]);
 
-    app.controller('WelcomeCtrl', function ($scope, $location, $stateParams, oHoustonSvc, dataAccess) {
+    app.controller('WelcomeCtrl', ['$scope', '$location', '$stateParams', 'oHoustonSvc', 'dataAccess', function ($scope, $location, $stateParams, oHoustonSvc, dataAccess) {
 
-    });
+    }]);
 })();

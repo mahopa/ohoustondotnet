@@ -33,7 +33,7 @@ namespace OHouston.Web
                 "~/Scripts/angular-google-maps.min.js"
                 ));
 
-            bundles.Add(new Bundle("~/bundles/ohoustoncore").Include(
+            bundles.Add(new ScriptBundle("~/bundles/ohoustoncore").Include(
                 "~/Scripts/app.js"
                 ));
         }
