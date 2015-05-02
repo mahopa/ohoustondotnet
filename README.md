@@ -21,7 +21,7 @@ Working sample here: <a href="http://ohoustondotnet.azurewebsites.net" target="_
 <li>angular templates and controllers seeded with boilerplate</li>
 <li>MVC-like server side modelstate form validation via gbModelState directive and template /partials/misc/ModelState.html </li>
 <li>Automatic cache-busting versioning. Check HomeController for where we define the version and how we make our router aware of the version when requesting partial view templates.</li>
-<li>Configure CORS in a turnkey manner so your project can quickly become a public facing re-usable API for others.</li>
+<li>CORS is set up in a turnkey manner so your project can quickly become a public facing re-usable API for others.</li>
 </ul>
 <br/>
 <p>
