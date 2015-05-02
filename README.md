@@ -6,7 +6,7 @@
 **Goals**<br/>
 This project is meant to create a solid starting platform for projects in the Open Houston initiative. Please feel free to make improvements.
 <hr/>
-Working sample here: <a href="http://ohoustondotnet.azurewebsites.net" target="_blank">There is no SSL, so do not use sensitive passwords.</a>
+Working sample here: <a href="http://ohoustondotnet.azurewebsites.net" target="_blank">There is no SSL set up for this site, so do not use sensitive passwords.</a>
 <br>
 <hr/>
 <h4>Features</h4>
