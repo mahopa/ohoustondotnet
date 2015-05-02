@@ -16,6 +16,9 @@ namespace OHouston.Web
         public static void Register(HttpConfiguration config)
         {
             config.Services.Replace(typeof(IBodyModelValidator), new PrefixlessBodyModelValidator(config.Services.GetBodyModelValidator()));
+
+            config.EnableCors();
+
             // Web API configuration and services
             // Configure Web API to use only bearer token authentication.
             config.SuppressDefaultHostAuthentication();
@@ -26,11 +29,12 @@ namespace OHouston.Web
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                routeTemplate: "api/{controller}/{id}/{action}",
+                defaults: new { id = RouteParameter.Optional, action = RouteParameter.Optional }
             );
         }
     }
+
     public class PrefixlessBodyModelValidator : IBodyModelValidator
     {
         private readonly IBodyModelValidator _innerValidator;
