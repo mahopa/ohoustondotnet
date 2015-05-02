@@ -33,3 +33,5 @@ One thing that might not be super obvious about this project is that it is prett
 <li>Server side unit tests.</li>
 <li>Client side unit tests.</li>
 </ul>
+<br/>
+<h3>Requires Visual Studio 2013 SDK in order to fully build solution. Download it here https://www.microsoft.com/en-us/download/details.aspx?id=40758 </h3>
