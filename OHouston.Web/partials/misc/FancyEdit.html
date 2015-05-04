@@ -1,0 +1,10 @@
+﻿<div ng-style="({'display':'inline-block','font-size':(size?size:'1')+'em', 'color':(color?color:'#555'), 'font-weight':bold?'bolder':'normal', 'cursor':editable?'pointer':'default'})">
+    <div ng-if="editing!=true" ng-click="beginEdit()">
+        <div style="white-space:pre;">{{datamodel[key]}} <span ng-if="$parent.editable" ng-tooltip="click to edit" style="font-size: 16px; display:inline-block;" class="icon ion-edit"></span></div>
+    </div>
+    <div ng-if="editing==true">
+        <gb-model-state nolabel="true" form="form" datamodel="datamodel" key="{{key}}" style="display: inline-block;"></gb-model-state>
+        <button type="submit" class="button button-clear" style="display:inline-block;" ng-tooltip="click to save"><span class="icon ion-upload"></span></button>
+        <button type="button" ng-click="restore()" class="button button-clear" style="display:inline-block;" ng-tooltip="click to cancel"><span class="icon ion-close"></span></button>
+    </div>
+</div>
